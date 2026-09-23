@@ -29,7 +29,6 @@ import com.example.sensortracker.sensor.AccelerometerSensor
 import com.example.sensortracker.sensor.GyroscopeSensor
 import com.example.sensortracker.sensor.SensorData
 import com.example.sensortracker.ui.theme.SensorTrackerTheme
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

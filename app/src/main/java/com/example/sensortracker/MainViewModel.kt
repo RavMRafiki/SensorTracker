@@ -9,11 +9,17 @@ import androidx.lifecycle.ViewModel
 import com.example.sensortracker.sensor.MeasurableSensor
 import com.example.sensortracker.sensor.SensorData
 import com.example.sensortracker.sensor.SensorRecord
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.lifecycle.viewModelScope
 
 class MainViewModel(
     private val accelerometer: MeasurableSensor,
@@ -31,21 +37,38 @@ class MainViewModel(
 
     private val recordedData = mutableListOf<SensorRecord>()
 
+    private val sensorChannel = Channel<SensorRecord>(
+        capacity = Channel.UNLIMITED,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
     init {
+        viewModelScope.launch(Dispatchers.Default) {
+            for (record in sensorChannel) {
+                recordedData.add(record)
+            }
+        }
+
         accelerometer.setOnSensorValuesChangedListener { values ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
+            val timestampVal = System.currentTimeMillis()
             accelerometerData = data
             if (isRecording) {
-                recordedData.add(SensorRecord(System.currentTimeMillis(), "Accelerometer", data.x, data.y, data.z))
+                sensorChannel.trySend(
+                    SensorRecord(timestampVal, "Accelerometer", data.x, data.y, data.z)
+                )
             }
         }
         accelerometer.startListening()
 
         gyroscope.setOnSensorValuesChangedListener { values ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
+            val timestampVal = System.currentTimeMillis()
             gyroscopeData = data
             if (isRecording) {
-                recordedData.add(SensorRecord(System.currentTimeMillis(), "Gyroscope", data.x, data.y, data.z))
+                sensorChannel.trySend(
+                    SensorRecord(timestampVal, "Gyroscope", data.x, data.y, data.z)
+                )
             }
         }
         gyroscope.startListening()
