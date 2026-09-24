@@ -44,7 +44,7 @@ abstract class AndroidSensor(
         }
         if(event?.sensor?.type == sensorType) {
             android.util.Log.d("SensorTracker", "Sensor $sensorType reporting: ${event.values[0]}, ${event.values[1]}, ${event.values[2]}")
-            onSensorValuesChanged?.invoke(event.values.toList())
+            onSensorValuesChanged?.invoke(event.values.toList(), event.timestamp)
         }
     }
 

@@ -53,37 +53,34 @@ class MainViewModel(
             }
         }
 
-        accelerometer.setOnSensorValuesChangedListener { values ->
+        accelerometer.setOnSensorValuesChangedListener { values, timestamp ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
-            val timestampVal = System.nanoTime()
             accelerometerData = data
             if (isRecording) {
                 sensorChannel.trySend(
-                    SensorRecord(timestampVal, "Accelerometer", data.x, data.y, data.z)
+                    SensorRecord(timestamp, "Accelerometer", data.x, data.y, data.z)
                 )
             }
         }
         accelerometer.startListening()
 
-        gyroscope.setOnSensorValuesChangedListener { values ->
+        gyroscope.setOnSensorValuesChangedListener { values, timestamp ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
-            val timestampVal = System.nanoTime()
             gyroscopeData = data
             if (isRecording) {
                 sensorChannel.trySend(
-                    SensorRecord(timestampVal, "Gyroscope", data.x, data.y, data.z)
+                    SensorRecord(timestamp, "Gyroscope", data.x, data.y, data.z)
                 )
             }
         }
         gyroscope.startListening()
 
-        linearAcceleration.setOnSensorValuesChangedListener { values ->
+        linearAcceleration.setOnSensorValuesChangedListener { values, timestamp ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
-            val timestampVal = System.nanoTime()
             linearAccelerationData = data
             if (isRecording) {
                 sensorChannel.trySend(
-                    SensorRecord(timestampVal, "LinearAccelerometer", data.x, data.y, data.z)
+                    SensorRecord(timestamp, "LinearAccelerometer", data.x, data.y, data.z)
                 )
             }
         }
