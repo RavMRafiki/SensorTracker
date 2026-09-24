@@ -24,12 +24,16 @@ import androidx.lifecycle.viewModelScope
 class MainViewModel(
     private val accelerometer: MeasurableSensor,
     private val gyroscope: MeasurableSensor,
+    private val linearAcceleration: MeasurableSensor
 ): ViewModel() {
 
     var accelerometerData by mutableStateOf(SensorData())
         private set
 
     var gyroscopeData by mutableStateOf(SensorData())
+        private set
+
+    var linearAccelerationData by mutableStateOf(SensorData())
         private set
 
     var isRecording by mutableStateOf(false)
@@ -72,6 +76,18 @@ class MainViewModel(
             }
         }
         gyroscope.startListening()
+
+        linearAcceleration.setOnSensorValuesChangedListener { values ->
+            val data = SensorData(x = values[0], y = values[1], z = values[2])
+            val timestampVal = System.nanoTime()
+            linearAccelerationData = data
+            if (isRecording) {
+                sensorChannel.trySend(
+                    SensorRecord(timestampVal, "LinearAccelerometer", data.x, data.y, data.z)
+                )
+            }
+        }
+        linearAcceleration.startListening()
     }
 
     fun startRecording() {

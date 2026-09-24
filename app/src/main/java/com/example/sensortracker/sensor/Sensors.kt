@@ -19,3 +19,11 @@ class GyroscopeSensor(
     sensorName = PackageManager.FEATURE_SENSOR_GYROSCOPE,
     sensorType = Sensor.TYPE_GYROSCOPE
 )
+
+class LinearAccelerometerSensor(
+    context: Context
+): AndroidSensor(
+    context = context,
+    sensorName = PackageManager.FEATURE_SENSOR_ACCELEROMETER,
+    sensorType = Sensor.TYPE_LINEAR_ACCELERATION
+)

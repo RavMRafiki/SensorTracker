@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sensortracker.sensor.AccelerometerSensor
 import com.example.sensortracker.sensor.GyroscopeSensor
+import com.example.sensortracker.sensor.LinearAccelerometerSensor
 import com.example.sensortracker.sensor.SensorData
 import com.example.sensortracker.ui.theme.SensorTrackerTheme
 class MainActivity : ComponentActivity() {
@@ -40,7 +41,8 @@ class MainActivity : ComponentActivity() {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             return MainViewModel(
                                 accelerometer = AccelerometerSensor(applicationContext),
-                                gyroscope = GyroscopeSensor(applicationContext)
+                                gyroscope = GyroscopeSensor(applicationContext),
+                                linearAcceleration = LinearAccelerometerSensor(applicationContext)
                             ) as T
                         }
                     }
@@ -71,7 +73,9 @@ fun SensorScreen(
         SensorDisplay(title = "Accelerometer", data = viewModel.accelerometerData)
         Spacer(modifier = Modifier.height(32.dp))
         SensorDisplay(title = "Gyroscope", data = viewModel.gyroscopeData)
-        
+        Spacer(modifier = Modifier.height(32.dp))
+        SensorDisplay(title = "LinearAccelerometer", data = viewModel.linearAccelerationData)
+
         Spacer(modifier = Modifier.height(48.dp))
         
         Text(
