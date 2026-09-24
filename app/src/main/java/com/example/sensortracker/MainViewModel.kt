@@ -51,7 +51,7 @@ class MainViewModel(
 
         accelerometer.setOnSensorValuesChangedListener { values ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
-            val timestampVal = System.currentTimeMillis()
+            val timestampVal = System.nanoTime()
             accelerometerData = data
             if (isRecording) {
                 sensorChannel.trySend(
@@ -63,7 +63,7 @@ class MainViewModel(
 
         gyroscope.setOnSensorValuesChangedListener { values ->
             val data = SensorData(x = values[0], y = values[1], z = values[2])
-            val timestampVal = System.currentTimeMillis()
+            val timestampVal = System.nanoTime()
             gyroscopeData = data
             if (isRecording) {
                 sensorChannel.trySend(
