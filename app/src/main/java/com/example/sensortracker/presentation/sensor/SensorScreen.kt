@@ -65,6 +65,7 @@ fun SensorScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
+                modifier = Modifier.weight(1f),
                 onClick = { viewModel.startRecording() },
                 enabled = !uiState.isRecording
             ) {
@@ -72,6 +73,7 @@ fun SensorScreen(
             }
 
             Button(
+                modifier = Modifier.weight(1f),
                 onClick = { viewModel.pauseRecording() },
                 enabled = uiState.isRecording
             ) {
@@ -81,11 +83,22 @@ fun SensorScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { viewModel.saveToCsv() },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text("Save CSV")
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = { viewModel.saveToCsv() }
+            ) {
+                Text("Save CSV")
+            }
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = { viewModel.saveToCsv() }
+            ) {
+                Text("Open CSV")
+            }
         }
     }
 }
