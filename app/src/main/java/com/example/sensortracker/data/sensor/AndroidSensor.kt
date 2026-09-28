@@ -1,4 +1,4 @@
-package com.example.sensortracker.sensor
+package com.example.sensortracker.data.sensor
 
 import android.content.Context
 import android.hardware.Sensor
@@ -10,7 +10,7 @@ abstract class AndroidSensor(
     private val context: Context,
     private val sensorName: String,
     sensorType: Int,
-): MeasurableSensor(sensorType), SensorEventListener {
+) : MeasurableSensor(sensorType), SensorEventListener {
 
     override val exists: Boolean
         get() = context.packageManager.hasSystemFeature(sensorName)
@@ -32,18 +32,17 @@ abstract class AndroidSensor(
     }
 
     override fun stopListening() {
-        if(!exists || !::sensorManager.isInitialized) {
+        if (!exists || !::sensorManager.isInitialized) {
             return
         }
         sensorManager.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if(!exists) {
+        if (!exists) {
             return
         }
-        if(event?.sensor?.type == sensorType) {
-            android.util.Log.d("SensorTracker", "Sensor $sensorType reporting: ${event.values[0]}, ${event.values[1]}, ${event.values[2]}")
+        if (event?.sensor?.type == sensorType) {
             onSensorValuesChanged?.invoke(event.values.toList(), event.timestamp)
         }
     }

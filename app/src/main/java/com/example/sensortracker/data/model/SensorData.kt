@@ -1,4 +1,4 @@
-package com.example.sensortracker.sensor
+package com.example.sensortracker.data.model
 
 data class SensorData(
     val x: Float = 0f,

@@ -1,9 +1,9 @@
-package com.example.sensortracker.sensor
+package com.example.sensortracker.data.sensor
 
 abstract class MeasurableSensor(
     protected val sensorType: Int
 ) {
-    protected var onSensorValuesChanged: ((List<Float> , Long) -> Unit)? = null
+    protected var onSensorValuesChanged: ((List<Float>, Long) -> Unit)? = null
 
     abstract val exists: Boolean
 

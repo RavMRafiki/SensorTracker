@@ -1,4 +1,4 @@
-package com.example.sensortracker.sensor
+package com.example.sensortracker.data.sensor
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -6,7 +6,7 @@ import android.hardware.Sensor
 
 class AccelerometerSensor(
     context: Context
-): AndroidSensor(
+) : AndroidSensor(
     context = context,
     sensorName = PackageManager.FEATURE_SENSOR_ACCELEROMETER,
     sensorType = Sensor.TYPE_ACCELEROMETER
@@ -14,7 +14,7 @@ class AccelerometerSensor(
 
 class GyroscopeSensor(
     context: Context
-): AndroidSensor(
+) : AndroidSensor(
     context = context,
     sensorName = PackageManager.FEATURE_SENSOR_GYROSCOPE,
     sensorType = Sensor.TYPE_GYROSCOPE
@@ -22,7 +22,7 @@ class GyroscopeSensor(
 
 class LinearAccelerometerSensor(
     context: Context
-): AndroidSensor(
+) : AndroidSensor(
     context = context,
     sensorName = PackageManager.FEATURE_SENSOR_ACCELEROMETER,
     sensorType = Sensor.TYPE_LINEAR_ACCELERATION
