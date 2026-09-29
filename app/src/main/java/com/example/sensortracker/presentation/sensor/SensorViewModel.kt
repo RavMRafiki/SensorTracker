@@ -1,5 +1,6 @@
 package com.example.sensortracker.presentation.sensor
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sensortracker.data.model.SensorData
@@ -99,9 +100,9 @@ class SensorViewModel(
         }
     }
 
-    fun openFiles() {
+    fun openFiles(context: Context) {
         viewModelScope.launch {
-
+            storageRepository.openDownloadsFolder(context)
         }
     }
 

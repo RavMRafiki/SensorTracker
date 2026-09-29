@@ -95,7 +95,7 @@ fun SensorScreen(
             }
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = { viewModel.saveToCsv() }
+                onClick = { viewModel.openFiles(context) }
             ) {
                 Text("Open CSV")
             }
