@@ -17,7 +17,7 @@ sealed class Screen(
 ) {
     data object Main : Screen(
         route = "main",
-        title = "Main",
+        title = "Tracker",
         selectedIcon = Icons.Filled.Sensors,
         unselectedIcon = Icons.Outlined.Sensors,
     )

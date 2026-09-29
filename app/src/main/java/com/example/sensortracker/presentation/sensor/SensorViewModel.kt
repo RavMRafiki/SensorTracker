@@ -99,6 +99,12 @@ class SensorViewModel(
         }
     }
 
+    fun openFiles() {
+        viewModelScope.launch {
+
+        }
+    }
+
     fun userMessageShown() {
         _uiState.update { it.copy(userMessage = null) }
     }

@@ -11,6 +11,8 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.provider.MediaStore
+import android.content.ContentValues
 
 interface SensorStorageRepository {
     suspend fun saveRecordsToCsv(records: List<SensorRecord>): Result<String>
@@ -22,26 +24,29 @@ class CsvSensorStorageRepository(
 ) : SensorStorageRepository {
 
     override suspend fun saveRecordsToCsv(records: List<SensorRecord>): Result<String> =
-        withContext(ioDispatcher) {
-            if (records.isEmpty()) {
-                return@withContext Result.failure(IllegalArgumentException("No data to save"))
+        runCatching {
+            val fileName = "records_${System.currentTimeMillis()}.csv"
+
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
 
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val fileName = "sensor_data_$timestamp.csv"
+            // 1. Insert into public Downloads
+            val uri = context.contentResolver.insert(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                values
+            ) ?: error("Failed to create file in Downloads")
 
-            try {
-                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
-                FileOutputStream(file).use { fos ->
-                    fos.write("timestamp,sensor,x,y,z\n".toByteArray())
-                    records.forEach { record ->
-                        val line = "${record.timestamp},${record.sensorType},${record.x},${record.y},${record.z}\n"
-                        fos.write(line.toByteArray())
-                    }
+            // 2. Stream the CSV lines
+            context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { writer ->
+                writer.appendLine("timestamp,sensor,x,y,z") // Header
+                records.forEach { record ->
+                    writer.appendLine("${record.timestamp},${record.sensorType},${record.x},${record.y},${record.z}")
                 }
-                Result.success(file.absolutePath)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            } ?: error("Failed to open output stream")
+
+            "Downloads/$fileName"
         }
 }
