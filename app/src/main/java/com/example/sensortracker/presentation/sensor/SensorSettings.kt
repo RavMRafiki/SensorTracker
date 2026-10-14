@@ -48,6 +48,7 @@ import com.example.sensortracker.ui.theme.VibrantCyanTeal
 fun SensorSettingCard(
     sensorType: SensorType,
     isEnabled: Boolean,
+    isAvailable: Boolean,
     selectedDelay: SensorSamplingDelay,
     onEnabledChange: (Boolean) -> Unit,
     onDelayChange: (SensorSamplingDelay) -> Unit,
@@ -70,7 +71,7 @@ fun SensorSettingCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onEnabledChange(!isEnabled) },
+                    .clickable(enabled = isAvailable) { onEnabledChange(!isEnabled) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -82,7 +83,7 @@ fun SensorSettingCard(
                         color = PrimaryText
                     )
                     Text(
-                        text = if (isEnabled) "Active" else "Disabled",
+                        text = if (!isAvailable) "Unavailable" else if (isEnabled) "Active" else "Disabled",
                         style = MaterialTheme.typography.bodySmall,
                         color = SecondaryText
                     )
@@ -90,10 +91,13 @@ fun SensorSettingCard(
                 Switch(
                     checked = isEnabled,
                     onCheckedChange = onEnabledChange,
+                    enabled = isAvailable,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = ElevatedCardSurface,
                         checkedTrackColor = VibrantCyanTeal,
-                        uncheckedTrackColor = CardBorderStroke
+                        uncheckedThumbColor = ElevatedCardSurface,
+                        uncheckedTrackColor = CardBorderStroke,
+                        disabledUncheckedThumbColor = ElevatedCardSurface,
                     )
                 )
             }

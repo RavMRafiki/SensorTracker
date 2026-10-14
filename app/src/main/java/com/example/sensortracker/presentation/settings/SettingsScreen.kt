@@ -53,6 +53,7 @@ fun SettingsScreen(
                 SensorSettingCard(
                     sensorType = config.type,
                     isEnabled = config.isEnabled,
+                    isAvailable = config.isAvailable,
                     selectedDelay = config.delay,
                     onEnabledChange = { newEnabled ->
                         viewModel.onEnabledChange(config.type, newEnabled)

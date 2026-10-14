@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SensorTrackerTheme {
-                val settingsRepository = remember { InMemorySettingsRepository() }
+                val settingsRepository = remember { InMemorySettingsRepository(applicationContext) }
                 val sensorFactory = remember { AndroidSensorFactory(applicationContext) }
                 val storageRepository = remember { CsvSensorStorageRepository(applicationContext) }
 

@@ -1,5 +1,6 @@
 package com.example.sensortracker.data.repository
 
+import android.content.Context
 import com.example.sensortracker.data.sensor.SensorConfig
 import com.example.sensortracker.data.sensor.SensorSamplingDelay
 import com.example.sensortracker.data.sensor.SensorType
@@ -14,7 +15,7 @@ interface SettingsRepository {
     fun updateDelay(type: SensorType, delay: SensorSamplingDelay)
 }
 
-class InMemorySettingsRepository : SettingsRepository {
+class InMemorySettingsRepository(context: Context) : SettingsRepository {
 
     private val _sensorConfigs = MutableStateFlow(
         listOf(
@@ -31,7 +32,13 @@ class InMemorySettingsRepository : SettingsRepository {
             SensorConfig(SensorType.PRESSURE, isEnabled = false, delay = SensorSamplingDelay.GAME),
             SensorConfig(SensorType.AMBIENT_TEMPERATURE, isEnabled = false, delay = SensorSamplingDelay.GAME),
             SensorConfig(SensorType.RELATIVE_HUMIDITY, isEnabled = false, delay = SensorSamplingDelay.GAME)
-        )
+        ).map { config ->
+            val isAvailable = config.type.sensorName == null || context.packageManager.hasSystemFeature(config.type.sensorName)
+            config.copy(
+                isAvailable = isAvailable,
+                isEnabled = if (isAvailable) config.isEnabled else false
+            )
+        }
     )
 
     override val sensorConfigs: StateFlow<List<SensorConfig>> = _sensorConfigs.asStateFlow()
