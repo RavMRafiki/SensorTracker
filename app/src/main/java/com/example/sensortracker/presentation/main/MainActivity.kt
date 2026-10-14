@@ -7,13 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,7 +36,11 @@ import com.example.sensortracker.presentation.sensor.SensorScreen
 import com.example.sensortracker.presentation.sensor.SensorViewModel
 import com.example.sensortracker.presentation.settings.SettingsScreen
 import com.example.sensortracker.presentation.settings.SettingsViewModel
+import com.example.sensortracker.ui.theme.BottomNavBackground
+import com.example.sensortracker.ui.theme.DeepNavyBlue
+import com.example.sensortracker.ui.theme.SecondaryText
 import com.example.sensortracker.ui.theme.SensorTrackerTheme
+import com.example.sensortracker.ui.theme.SoftIceBlue
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,8 +82,12 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
+                    containerColor = SoftIceBlue,
                     bottomBar = {
-                        NavigationBar {
+                        NavigationBar(
+                            containerColor = BottomNavBackground,
+                            contentColor = DeepNavyBlue
+                        ) {
                             Screen.items.forEach { screen ->
                                 val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                                 NavigationBarItem(
@@ -85,7 +97,13 @@ class MainActivity : ComponentActivity() {
                                             contentDescription = screen.title
                                         )
                                     },
-                                    label = { Text(screen.title) },
+                                    label = {
+                                        Text(
+                                            text = screen.title,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
                                     selected = selected,
                                     onClick = {
                                         navController.navigate(screen.route) {
@@ -95,7 +113,14 @@ class MainActivity : ComponentActivity() {
                                             launchSingleTop = true
                                             restoreState = true
                                         }
-                                    }
+                                    },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = Color.White,
+                                        selectedTextColor = DeepNavyBlue,
+                                        indicatorColor = DeepNavyBlue,
+                                        unselectedIconColor = SecondaryText,
+                                        unselectedTextColor = SecondaryText
+                                    )
                                 )
                             }
                         }

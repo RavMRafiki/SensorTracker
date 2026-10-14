@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Brand & Accent Colors -->
+    <color name="deep_navy_blue">#002E5D</color>
+    <color name="electric_azure_blue">#0088FF</color>
+    <color name="vibrant_cyan_teal">#18D2B8</color>
+    <color name="rich_cobalt_navy">#003B73</color>
+
+    <!-- Backgrounds & Surfaces -->
+    <color name="soft_ice_blue">#F0F6FC</color>
+    <color name="elevated_card_surface">#FFFFFF</color>
+    <color name="card_border_stroke">#D8E6F3</color>
+    <color name="bottom_nav_background">#E1ECF7</color>
+    <color name="dropdown_menu_surface">#D5E3F0</color>
+
+    <!-- Typography & UI States -->
+    <color name="primary_text">#0A192F</color>
+    <color name="secondary_text">#5A7184</color>
+    <color name="disabled_button_bg">#DCE5EF</color>
+    <color name="disabled_text_icon">#7C90A4</color>
 </resources>
