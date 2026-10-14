@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,14 +24,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sensortracker.data.repository.CsvSensorStorageRepository
-import com.example.sensortracker.data.sensor.AccelerometerSensor
-import com.example.sensortracker.data.sensor.GyroscopeSensor
-import com.example.sensortracker.data.sensor.LinearAccelerometerSensor
+import com.example.sensortracker.data.repository.InMemorySettingsRepository
+import com.example.sensortracker.data.sensor.AndroidSensorFactory
 import com.example.sensortracker.presentation.graphs.GraphsScreen
 import com.example.sensortracker.presentation.navigation.Screen
 import com.example.sensortracker.presentation.sensor.SensorScreen
 import com.example.sensortracker.presentation.sensor.SensorViewModel
 import com.example.sensortracker.presentation.settings.SettingsScreen
+import com.example.sensortracker.presentation.settings.SettingsViewModel
 import com.example.sensortracker.ui.theme.SensorTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,15 +40,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SensorTrackerTheme {
-                val viewModel = viewModel<SensorViewModel>(
+                val settingsRepository = remember { InMemorySettingsRepository() }
+                val sensorFactory = remember { AndroidSensorFactory(applicationContext) }
+                val storageRepository = remember { CsvSensorStorageRepository(applicationContext) }
+
+                val sensorViewModel = viewModel<SensorViewModel>(
                     factory = object : ViewModelProvider.Factory {
                         @Suppress("UNCHECKED_CAST")
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             return SensorViewModel(
-                                accelerometer = AccelerometerSensor(applicationContext),
-                                gyroscope = GyroscopeSensor(applicationContext),
-                                linearAcceleration = LinearAccelerometerSensor(applicationContext),
-                                storageRepository = CsvSensorStorageRepository(applicationContext)
+                                sensorFactory = sensorFactory,
+                                settingsRepository = settingsRepository,
+                                storageRepository = storageRepository
+                            ) as T
+                        }
+                    }
+                )
+
+                val settingsViewModel = viewModel<SettingsViewModel>(
+                    factory = object : ViewModelProvider.Factory {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return SettingsViewModel(
+                                settingsRepository = settingsRepository
                             ) as T
                         }
                     }
@@ -92,13 +107,13 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Screen.Main.route) {
-                            SensorScreen(viewModel = viewModel)
+                            SensorScreen(viewModel = sensorViewModel)
                         }
                         composable(Screen.Graphs.route) {
                             GraphsScreen()
                         }
                         composable(Screen.Settings.route) {
-                            SettingsScreen()
+                            SettingsScreen(viewModel = settingsViewModel)
                         }
                     }
                 }

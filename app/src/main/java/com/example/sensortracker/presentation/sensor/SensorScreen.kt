@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,16 +43,34 @@ fun SensorScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SensorDisplay(title = "Accelerometer", data = uiState.accelerometerData)
-        Spacer(modifier = Modifier.height(32.dp))
-        SensorDisplay(title = "Gyroscope", data = uiState.gyroscopeData)
-        Spacer(modifier = Modifier.height(32.dp))
-        SensorDisplay(title = "LinearAccelerometer", data = uiState.linearAccelerationData)
+        if (uiState.activeSensorData.isEmpty()) {
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "No sensors active. Enable sensors in Settings.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(
+                    items = uiState.activeSensorData.toList(),
+                    key = { (sensorType, _) -> sensorType.name }
+                ) { (sensorType, data) ->
+                    SensorDisplay(title = sensorType.displayName, data = data)
+                }
+            }
+        }
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = if (uiState.isRecording) "Recording..." else "Not Recording",
@@ -106,9 +126,7 @@ fun SensorScreen(
 @Composable
 fun SensorDisplay(title: String, data: SensorData) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = title, style = MaterialTheme.typography.headlineMedium)
-        Text(text = "X: ${"%.2f".format(data.x)}")
-        Text(text = "Y: ${"%.2f".format(data.y)}")
-        Text(text = "Z: ${"%.2f".format(data.z)}")
+        Text(text = title, style = MaterialTheme.typography.titleMedium)
+        Text(text = "X: ${"%.2f".format(data.x)} | Y: ${"%.2f".format(data.y)} | Z: ${"%.2f".format(data.z)}")
     }
 }

@@ -3,7 +3,7 @@ package com.example.sensortracker.data.sensor
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 
-enum class SensorType(val displayName: String, sensorName: String? = null, sensorType: Int) {
+enum class SensorType(val displayName: String, val sensorName: String? = null, val sensorType: Int) {
     ACCELEROMETER("Accelerometer",
         PackageManager.FEATURE_SENSOR_ACCELEROMETER,
         Sensor.TYPE_ACCELEROMETER
