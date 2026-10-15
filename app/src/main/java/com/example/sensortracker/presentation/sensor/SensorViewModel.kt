@@ -72,7 +72,7 @@ class SensorViewModel(
                 val x = values.getOrNull(0) ?: 0f
                 val y = values.getOrNull(1) ?: 0f
                 val z = values.getOrNull(2) ?: 0f
-                val data = SensorData(x = x, y = y, z = z)
+                val data = SensorData(x = x, y = y, z = z, timestamp = timestamp)
 
                 _uiState.update { state ->
                     val updatedMap = state.activeSensorData.toMutableMap()
@@ -89,8 +89,19 @@ class SensorViewModel(
                         else -> Unit
                     }
 
+                    val historyMap = state.activeSensorHistory.toMutableMap()
+                    val currentHistory = historyMap[type]?.toMutableList() ?: mutableListOf()
+                    currentHistory.add(data)
+                    
+                    val fiveSecondsInNanos = 5_000_000_000L
+                    while (currentHistory.isNotEmpty() && currentHistory.first().timestamp < timestamp - fiveSecondsInNanos) {
+                        currentHistory.removeAt(0)
+                    }
+                    historyMap[type] = currentHistory
+
                     state.copy(
                         activeSensorData = updatedMap,
+                        activeSensorHistory = historyMap,
                         accelerometerData = accel,
                         gyroscopeData = gyro,
                         linearAccelerationData = linear

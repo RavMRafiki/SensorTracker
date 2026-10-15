@@ -135,7 +135,7 @@ class MainActivity : ComponentActivity() {
                             SensorScreen(viewModel = sensorViewModel)
                         }
                         composable(Screen.Graphs.route) {
-                            GraphsScreen()
+                            GraphsScreen(viewModel = sensorViewModel)
                         }
                         composable(Screen.Settings.route) {
                             SettingsScreen(viewModel = settingsViewModel)

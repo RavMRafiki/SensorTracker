@@ -397,7 +397,7 @@ fun SensorValuePill(
     }
 }
 
-private fun isMultiAxisSensor(type: SensorType): Boolean {
+fun isMultiAxisSensor(type: SensorType): Boolean {
     return when (type) {
         SensorType.ACCELEROMETER,
         SensorType.GYROSCOPE,
@@ -410,7 +410,7 @@ private fun isMultiAxisSensor(type: SensorType): Boolean {
     }
 }
 
-private fun getSensorIcon(type: SensorType): ImageVector {
+fun getSensorIcon(type: SensorType): ImageVector {
     return when (type) {
         SensorType.ACCELEROMETER -> Icons.Outlined.Speed
         SensorType.GYROSCOPE -> Icons.Outlined.Explore
