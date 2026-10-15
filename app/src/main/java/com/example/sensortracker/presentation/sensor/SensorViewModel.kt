@@ -6,7 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.sensortracker.data.model.SensorData
 import com.example.sensortracker.data.model.SensorRecord
 import com.example.sensortracker.data.repository.SensorStorageRepository
+import com.example.sensortracker.data.repository.SettingsRepository
 import com.example.sensortracker.data.sensor.MeasurableSensor
+import com.example.sensortracker.data.sensor.SensorConfig
+import com.example.sensortracker.data.sensor.SensorFactory
+import com.example.sensortracker.data.sensor.SensorType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -17,9 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SensorViewModel(
-    private val accelerometer: MeasurableSensor,
-    private val gyroscope: MeasurableSensor,
-    private val linearAcceleration: MeasurableSensor,
+    private val sensorFactory: SensorFactory,
+    private val settingsRepository: SettingsRepository,
     private val storageRepository: SensorStorageRepository
 ) : ViewModel() {
 
@@ -33,7 +36,7 @@ class SensorViewModel(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private val sensors = listOf(accelerometer, gyroscope, linearAcceleration)
+    private val activeSensorsMap = mutableMapOf<SensorType, MeasurableSensor>()
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
@@ -44,34 +47,74 @@ class SensorViewModel(
             }
         }
 
-        setupSensor(accelerometer, "Accelerometer") { data ->
-            _uiState.update { it.copy(accelerometerData = data) }
+        viewModelScope.launch {
+            settingsRepository.sensorConfigs.collect { configs ->
+                rebuildSensors(configs)
+            }
         }
-
-        setupSensor(gyroscope, "Gyroscope") { data ->
-            _uiState.update { it.copy(gyroscopeData = data) }
-        }
-
-        setupSensor(linearAcceleration, "LinearAccelerometer") { data ->
-            _uiState.update { it.copy(linearAccelerationData = data) }
-        }
-
-        sensors.forEach { it.startListening() }
     }
 
-    private fun setupSensor(
-        sensor: MeasurableSensor,
-        sensorName: String,
-        onUiUpdate: (SensorData) -> Unit
-    ) {
-        sensor.setOnSensorValuesChangedListener { values, timestamp ->
-            val data = SensorData(x = values[0], y = values[1], z = values[2])
-            onUiUpdate(data)
-            if (_uiState.value.isRecording) {
-                sensorChannel.trySend(
-                    SensorRecord(timestamp, sensorName, data.x, data.y, data.z)
-                )
+    private fun rebuildSensors(configs: List<SensorConfig>) {
+        // Stop current listening sensors
+        activeSensorsMap.values.forEach { it.stopListening() }
+        activeSensorsMap.clear()
+
+        // Create new active sensors using Factory based on settings
+        val newSensors = sensorFactory.createActiveSensors(configs)
+        activeSensorsMap.putAll(newSensors)
+
+        val initialDataMap = newSensors.keys.associateWith { SensorData() }
+        _uiState.update { it.copy(activeSensorData = initialDataMap) }
+
+        // Configure listeners and start listening
+        activeSensorsMap.forEach { (type, sensor) ->
+            sensor.setOnSensorValuesChangedListener { values, timestamp ->
+                val x = values.getOrNull(0) ?: 0f
+                val y = values.getOrNull(1) ?: 0f
+                val z = values.getOrNull(2) ?: 0f
+                val data = SensorData(x = x, y = y, z = z, timestamp = timestamp)
+
+                _uiState.update { state ->
+                    val updatedMap = state.activeSensorData.toMutableMap()
+                    updatedMap[type] = data
+
+                    var accel = state.accelerometerData
+                    var gyro = state.gyroscopeData
+                    var linear = state.linearAccelerationData
+
+                    when (type) {
+                        SensorType.ACCELEROMETER -> accel = data
+                        SensorType.GYROSCOPE -> gyro = data
+                        SensorType.LINEAR_ACCELERATION -> linear = data
+                        else -> Unit
+                    }
+
+                    val historyMap = state.activeSensorHistory.toMutableMap()
+                    val currentHistory = historyMap[type]?.toMutableList() ?: mutableListOf()
+                    currentHistory.add(data)
+                    
+                    val fiveSecondsInNanos = 5_000_000_000L
+                    while (currentHistory.isNotEmpty() && currentHistory.first().timestamp < timestamp - fiveSecondsInNanos) {
+                        currentHistory.removeAt(0)
+                    }
+                    historyMap[type] = currentHistory
+
+                    state.copy(
+                        activeSensorData = updatedMap,
+                        activeSensorHistory = historyMap,
+                        accelerometerData = accel,
+                        gyroscopeData = gyro,
+                        linearAccelerationData = linear
+                    )
+                }
+
+                if (_uiState.value.isRecording) {
+                    sensorChannel.trySend(
+                        SensorRecord(timestamp, type.displayName, x, y, z)
+                    )
+                }
             }
+            sensor.startListening()
         }
     }
 
@@ -112,6 +155,6 @@ class SensorViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        sensors.forEach { it.stopListening() }
+        activeSensorsMap.values.forEach { it.stopListening() }
     }
 }

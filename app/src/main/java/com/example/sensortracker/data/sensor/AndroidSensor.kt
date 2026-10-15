@@ -8,12 +8,13 @@ import android.hardware.SensorManager
 
 abstract class AndroidSensor(
     private val context: Context,
-    private val sensorName: String,
+    private val sensorName: String?,
     sensorType: Int,
+    private val samplingDelay: SensorSamplingDelay = SensorSamplingDelay.NORMAL
 ) : MeasurableSensor(sensorType), SensorEventListener {
 
     override val exists: Boolean
-        get() = context.packageManager.hasSystemFeature(sensorName)
+        get() = sensorName == null || context.packageManager.hasSystemFeature(sensorName)
 
     private lateinit var sensorManager: SensorManager
     private var sensor: Sensor? = null
@@ -27,7 +28,7 @@ abstract class AndroidSensor(
             sensor = sensorManager.getDefaultSensor(sensorType)
         }
         sensor?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
+            sensorManager.registerListener(this, it, samplingDelay.delayUs)
         }
     }
 
