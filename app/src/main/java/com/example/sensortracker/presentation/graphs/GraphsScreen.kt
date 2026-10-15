@@ -83,7 +83,7 @@ fun GraphsScreen(
                 fontSize = 32.sp
             )
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.ic_launcher_playstore),
                 contentDescription = "App Icon",
                 modifier = Modifier
                     .size(48.dp)
