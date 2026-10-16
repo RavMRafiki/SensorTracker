@@ -40,15 +40,37 @@
 
 ```
 com.example.sensortracker/
-├── MainActivity.kt         # Entry activity & Compose UI rendering (SensorScreen, SensorDisplay)
-├── MainViewModel.kt        # State management, recording pipeline, and CSV file generation
-├── sensor/
-│   ├── MeasurableSensor.kt # Abstract base class for sensor wrappers
-│   ├── AndroidSensor.kt    # Generic Android SensorEventListener wrapper
-│   ├── Sensors.kt          # Concrete implementations (Accelerometer, Gyroscope, LinearAccelerometer)
-│   ├── SensorData.kt       # Data class representing instantaneous (x, y, z) state
-│   └── SensorRecord.kt     # Data class representing recorded sensor sample with timestamp
-└── ui/theme/               # Jetpack Compose Material 3 theme definitions
+├── presentation/
+│   ├── main/
+│   │   └── MainActivity.kt         # Entry activity
+│   ├── navigation/
+│   │   └── Screen.kt               # Navigation definitions
+│   ├── sensor/
+│   │   ├── SensorScreen.kt         # Main sensor UI
+│   │   ├── SensorSettings.kt       # Sensor configuration UI
+│   │   ├── SensorUiState.kt        # UI state for sensors
+│   │   └── SensorViewModel.kt      # State management and recording logic
+│   ├── settings/
+│   │   ├── SettingsScreen.kt       # App settings UI
+│   │   └── SettingsViewModel.kt    # Settings state management
+│   └── graphs/
+│       └── GraphsScreen.kt         # Graphs UI
+├── data/
+│   ├── model/
+│   │   ├── SensorData.kt           # Data class representing instantaneous (x, y, z) state
+│   │   └── SensorRecord.kt         # Data class representing recorded sensor sample with timestamp
+│   ├── repository/
+│   │   ├── SensorStorageRepository.kt # Handles CSV file generation and storage
+│   │   └── SettingsRepository.kt   # Handles app settings storage
+│   └── sensor/
+│       ├── MeasurableSensor.kt     # Abstract base class for sensor wrappers
+│       ├── AndroidSensor.kt        # Generic Android SensorEventListener wrapper
+│       ├── Sensors.kt              # Concrete implementations (Accelerometer, Gyroscope, LinearAccelerometer)
+│       ├── SensorType.kt           # Enum for supported sensor types
+│       ├── SensorConfig.kt         # Data class for sensor configuration
+│       ├── SensorSamplingDelay.kt  # Enum for sampling delay options
+│       └── SensorFactory.kt        # Factory for creating sensor instances
+└── ui/theme/                       # Jetpack Compose Material 3 theme definitions
 ```
 
 ---
@@ -82,9 +104,9 @@ com.example.sensortracker/
 1. **View Telemetry**: Launch the app to observe live sensor streams for Accelerometer, Gyroscope, and Linear Acceleration.
 2. **Start Recording**: Tap the **Start** button to begin storing sensor events.
 3. **Pause Recording**: Tap **Pause** to temporarily hold data collection.
-4. **Save CSV**: Tap **Save CSV** to output all recorded samples into a `.csv` file. A toast notification will display the saved file path:
+4. **Save CSV**: Tap **Save CSV** to output all recorded samples into a `.csv` file. The file will be saved directly to your device's public **Downloads** directory:
    ```
-   Android/data/com.example.sensortracker/files/Documents/sensor_data_YYYYMMDD_HHmmss.csv
+   Downloads/SensorTracker_records_YYYYMMDD_HHmmss.csv
    ```
 
 ---
