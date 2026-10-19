@@ -39,7 +39,7 @@
 ## 📂 Project Structure
 
 ```
-com.example.sensortracker/
+com.ravmrafiki.sensortracker/
 ├── presentation/
 │   ├── main/
 │   │   └── MainActivity.kt         # Entry activity
